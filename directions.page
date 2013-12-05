@@ -1,0 +1,54 @@
+<apex:page standardController="Account">
+   <apex:includeScript value="{!$Resource.googleMapsAPI}" />
+
+   <div>
+     <div id="map" style='display:none'></div>
+     <div id="panel"></div> 
+   </div>
+
+   <script type="text/javascript"> 
+
+     var directionsService = new google.maps.DirectionsService();
+     var directionsDisplay = new google.maps.DirectionsRenderer();
+     var map = new google.maps.Map(document.getElementById('map'), {
+       zoom:7,
+       mapTypeId: google.maps.MapTypeId.ROADMAP
+     });
+
+     directionsDisplay.setMap(map);
+     directionsDisplay.setPanel(document.getElementById('panel'));
+     if (navigator.geolocation) {
+         navigator.geolocation.getCurrentPosition(function (position) {
+             var latitude = position.coords.latitude;                    //users current
+             var longitude = position.coords.longitude;                 //location
+             var coords = new google.maps.LatLng(latitude, longitude); //Creates variable
+             
+             var request = {
+               origin: coords, 
+               destination: "{! account.BillingStreet}, {! account.BillingCity }, {! account.BillingState }",
+
+               travelMode: google.maps.DirectionsTravelMode.DRIVING
+             };
+        
+             directionsService.route(request, function(response, status) {
+               if (status == google.maps.DirectionsStatus.OK) {
+                 directionsDisplay.setDirections(response);
+               }
+             });
+         });
+     } else {
+         var request = {
+           origin: origin, 
+           destination: 'New York',
+           travelMode: google.maps.DirectionsTravelMode.DRIVING
+         };
+    
+         directionsService.route(request, function(response, status) {
+           if (status == google.maps.DirectionsStatus.OK) {
+             directionsDisplay.setDirections(response);
+           }
+         });
+         }
+
+   </script>
+</apex:page>
